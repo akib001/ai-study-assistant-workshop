@@ -1,4 +1,4 @@
-import { FileData } from '@/types/data.types'
+import { FileData, FileType } from '@/types/data.types'
 import { Accordion, AccordionItem, Checkbox, Divider } from '@nextui-org/react'
 import clsx from 'clsx'
 import React, { useMemo } from 'react'
@@ -49,6 +49,9 @@ export const SearchResult: React.FC<SearchResultProps> = ({
   compactOverview = false,
   ...props
 }) => {
+  const [filteredFileTypes, setFilteredFileTypes] = React.useState<
+    Set<FileType>
+  >(() => new Set())
   const map: Record<string, FileData> = useMemo(
     () => Object.fromEntries(files.map((file) => [file.id, file])),
     [files, selected],
@@ -57,9 +60,13 @@ export const SearchResult: React.FC<SearchResultProps> = ({
   const [directoriesGroup, filesGroup] = useMemo(
     () => [
       files.filter((f) => f.type === 'folder'),
-      files.filter((f) => f.type !== 'folder'),
+      files.filter((f) =>
+        f.type !== 'folder' && filteredFileTypes.size === 0
+          ? true
+          : filteredFileTypes.has(f.type),
+      ),
     ],
-    [files, map],
+    [files, map, filteredFileTypes],
   )
 
   const onSelectionChange = (newValue: string[]) => {
@@ -114,6 +121,8 @@ export const SearchResult: React.FC<SearchResultProps> = ({
               !compactOverview && 'translate-y-0',
               compactOverview && 'translate-y-[-50px]',
             )}
+            filteredFileTypes={filteredFileTypes}
+            onFilteredFileTypesChange={setFilteredFileTypes}
           />
         </div>
       </div>

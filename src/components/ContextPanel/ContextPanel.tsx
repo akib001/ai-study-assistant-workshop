@@ -1,7 +1,7 @@
-import { FileData } from '@/types/data.types'
+import { FileData, FileType } from '@/types/data.types'
 import { Chip } from '@nextui-org/react'
 import clsx from 'clsx'
-import React, { useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import {
   AudioFileIcon,
   DraftIcon,
@@ -27,6 +27,8 @@ export type ContextPanelProps = Omit<
   selected: string[]
   compact?: boolean
   map: Record<string, FileData>
+  filteredFileTypes: Set<FileType>
+  onFilteredFileTypesChange: React.Dispatch<React.SetStateAction<Set<FileType>>>
 }
 
 export const ContextPanel: React.FC<ContextPanelProps> = ({
@@ -34,6 +36,8 @@ export const ContextPanel: React.FC<ContextPanelProps> = ({
   map,
   compact = false,
   className,
+  filteredFileTypes,
+  onFilteredFileTypesChange,
   ...props
 }) => {
   const numberOfFiles = Object.values(map).filter(
@@ -57,6 +61,21 @@ export const ContextPanel: React.FC<ContextPanelProps> = ({
     return Object.entries(groups) as [FileData['type'], FileData[]][]
   }, [selected, map])
 
+  const handleChipClick = useCallback(
+    (key: FileType) => {
+      onFilteredFileTypesChange((prevFilteredFileTypes) => {
+        const updatedFilteredFileTypes = new Set(prevFilteredFileTypes)
+        if (updatedFilteredFileTypes.has(key)) {
+          updatedFilteredFileTypes.delete(key)
+        } else {
+          updatedFilteredFileTypes.add(key)
+        }
+        return updatedFilteredFileTypes
+      })
+    },
+    [onFilteredFileTypesChange],
+  )
+
   return (
     <div
       className={clsx(className, 'flex flex-row items-end justify-between')}
@@ -76,11 +95,13 @@ export const ContextPanel: React.FC<ContextPanelProps> = ({
           return (
             <Chip
               key={key + items.length}
+              onClick={() => handleChipClick(key)}
               variant="flat"
               color="primary"
               className={clsx(
-                'py-[20px] px-[16px] bg-[#ECECEC]',
+                'py-[20px] px-[16px] bg-[#ECECEC] cursor-pointer',
                 'duration-100',
+                filteredFileTypes.has(key) && 'bg-blue-200',
                 compact &&
                   items.length === 0 && [
                     'opacity-0',
