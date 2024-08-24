@@ -1,19 +1,27 @@
+import { useConversations } from '@/contexts/ConversationContext'
+import { FileData } from '@/types/data.types'
 import clsx from 'clsx'
 import React, { useEffect, useRef } from 'react'
-import { ChatMessage, ChatMessageProps } from '../ChatMessage'
+import { ChatMessage } from '../ChatMessage'
 
-export type ChatMessagesProps = Omit<
-  React.HTMLProps<HTMLDivElement>,
-  'data'
-> & {
-  data?: Pick<ChatMessageProps, 'message' | 'role' | 'disableAnimation'>[]
+export type ChatMessagesProps = {
+  className?: string
+  files: FileData[]
 }
 
 export const ChatMessages: React.FC<ChatMessagesProps> = ({
-  data = [],
+  files,
   ...props
 }) => {
+  const conversations = useConversations()
   const ref = useRef<HTMLDivElement>(null)
+  const data =
+    conversations?.currentPath.map((id) => ({
+      id,
+      message: conversations.messagesById[id].content,
+      role: conversations.messagesById[id].role,
+    })) || []
+
   const messagesRef = useRef(data)
 
   useEffect(() => {
@@ -21,15 +29,17 @@ export const ChatMessages: React.FC<ChatMessagesProps> = ({
     if (messagesRef.current.length === data.length) return
 
     messagesRef.current = data
-
     const parent = ref.current.parentElement
-    setTimeout(() => {
-      parent?.scrollBy({
-        top: parent.scrollHeight,
-        behavior: 'smooth',
-      })
-    }, 1000)
-  }, [data])
+
+    if (!conversations?.disableAnimation) {
+      setTimeout(() => {
+        parent?.scrollBy({
+          top: parent.scrollHeight,
+          behavior: 'smooth',
+        })
+      }, 1000)
+    }
+  }, [data, conversations?.disableAnimation])
 
   return (
     <div
@@ -42,10 +52,14 @@ export const ChatMessages: React.FC<ChatMessagesProps> = ({
     >
       {data.map((message, index) => (
         <ChatMessage
-          key={index}
+          key={message.id}
+          id={message.id}
           role={message.role}
           message={message.message}
-          disableAnimation={message.disableAnimation || index < data.length - 1}
+          disableAnimation={
+            conversations?.disableAnimation || index < data.length - 1
+          }
+          files={files}
         />
       ))}
     </div>

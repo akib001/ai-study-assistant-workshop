@@ -1,4 +1,5 @@
 import { ApiSearchParams, ApiSearchResponse, searchApi } from '@/services/api'
+import { extractErrorMessage } from '@/services/api/utils'
 import { UseQueryOptions, useQuery } from '@tanstack/react-query'
 
 export type UseSearchParams = ApiSearchParams
@@ -10,7 +11,13 @@ export const useSearch = (
 ) => {
   return useQuery<UseSearchResponse>({
     queryKey: ['search', params.query],
-    queryFn: () => searchApi(params),
+    queryFn: async () => {
+      try {
+        return await searchApi(params)
+      } catch (error) {
+        throw new Error(extractErrorMessage(error))
+      }
+    },
     ...opts,
   })
 }

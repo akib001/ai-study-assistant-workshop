@@ -1,9 +1,9 @@
 import { ChatMessages } from '@/components/ChatMessages'
 import { MessageBar } from '@/components/MessageBar'
 import { Search } from '@/components/Search'
+import { ConversationProvider } from '@/contexts/ConversationContext'
 import { ChatLayout } from '@/layouts/ChatLayout/Chat.layout'
 import { useSearch } from '@/queries/useSearch'
-import { ApiChatMessage, chatApi } from '@/services/api'
 import { populateDirs } from '@/utils/populateDirs.util'
 import React, { useEffect, useMemo, useState } from 'react'
 
@@ -11,10 +11,7 @@ export type HomePageProps = React.HTMLProps<HTMLDivElement>
 
 export const HomePage: React.FC<HomePageProps> = ({ className, ...props }) => {
   const [query, setQuery] = useState('')
-  const [prompt, setPrompt] = useState('')
-  const [selectedFiles, setSelectedFiles] = useState<string[]>([])
-  const [messages, setMessages] = useState<ApiChatMessage[]>([])
-  const [generating, setGenerating] = useState(false)
+  const [selectedFiles, setSelectedFiles] = useState<string[]>([]) //TODO: sometimes it lost state
 
   const search = useSearch(
     { query },
@@ -23,6 +20,7 @@ export const HomePage: React.FC<HomePageProps> = ({ className, ...props }) => {
       enabled: false,
       keepPreviousData: true,
       refetchOnWindowFocus: false,
+      useErrorBoundary: true,
     },
   )
 
@@ -35,28 +33,6 @@ export const HomePage: React.FC<HomePageProps> = ({ className, ...props }) => {
     search.refetch()
   }
 
-  const onPrompt = async (prompt: string) => {
-    setGenerating(true)
-
-    setMessages((value) => [
-      ...value,
-      {
-        role: 'user',
-        message: prompt,
-      },
-    ])
-
-    const { message } = await chatApi({
-      prompt,
-      files: fileList.filter((f) => selectedFiles.includes(f.id)),
-      history: messages,
-    })
-
-    setGenerating(false)
-    setMessages((value) => [...value, message])
-    setPrompt('')
-  }
-
   useEffect(() => {
     setSelectedFiles([])
   }, [search.data])
@@ -66,35 +42,29 @@ export const HomePage: React.FC<HomePageProps> = ({ className, ...props }) => {
   }, [])
 
   return (
-    <ChatLayout
-      messageBar={
-        <MessageBar
-          hide={selectedFiles.length === 0}
-          prompt={prompt}
-          onPromptChange={setPrompt}
-          onSubmit={(prompt) => onPrompt(prompt)}
-          loading={generating}
-          disabled={generating}
+    <ConversationProvider>
+      <ChatLayout
+        messageBar={
+          <MessageBar
+            hide={selectedFiles.length === 0}
+            files={fileList.filter((f) => selectedFiles.includes(f.id))}
+          />
+        }
+      >
+        <Search
+          searching={search.isFetching}
+          query={query}
+          onQueryChange={(v) => setQuery(v)}
+          onSearch={onSearch}
+          results={fileList}
+          onSelect={(selected) => setSelectedFiles(selected)}
+          selectedFiles={selectedFiles}
         />
-      }
-    >
-      <Search
-        compact={messages.length > 0}
-        searching={search.isFetching}
-        query={query}
-        onQueryChange={(v) => setQuery(v)}
-        onSearch={onSearch}
-        results={fileList}
-        onSelect={(selected) => setSelectedFiles(selected)}
-        selectedFiles={selectedFiles}
-      />
-      <ChatMessages
-        className="py-[20px]"
-        data={messages.map((msg) => ({
-          role: msg.role,
-          message: msg.message,
-        }))}
-      />
-    </ChatLayout>
+        <ChatMessages
+          className="py-5"
+          files={fileList.filter((f) => selectedFiles.includes(f.id))}
+        />
+      </ChatLayout>
+    </ConversationProvider>
   )
 }

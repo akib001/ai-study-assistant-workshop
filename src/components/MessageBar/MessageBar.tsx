@@ -1,3 +1,6 @@
+import { useConversations } from '@/contexts/ConversationContext'
+import { usePromptSubmit } from '@/hooks/usePromptSubmit.hook'
+import { FileData } from '@/types/data.types'
 import { Button, TextAreaProps, Textarea } from '@nextui-org/react'
 import clsx from 'clsx'
 import React, { memo } from 'react'
@@ -8,31 +11,21 @@ export type MessageBarProps = Omit<
   'onSubmit'
 > & {
   hide?: boolean
-  disabled?: boolean
-  loading?: boolean
-  prompt?: string
-  onSubmit?: (prompt: string) => void
-  onPromptChange?: (prompt: string) => void
-
+  files: FileData[]
   textareaProps?: TextAreaProps
 }
 
 export const MessageBar: React.FC<MessageBarProps> = memo(
-  ({
-    prompt,
-    hide,
-    disabled = false,
-    loading = false,
-    onPromptChange,
-    onSubmit,
-    textareaProps = {},
-    ...props
-  }) => {
-    const onFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  ({ hide, files, textareaProps = {}, ...props }) => {
+    const conversations = useConversations()
+
+    const { textValue, setTextValue, onSubmit } = usePromptSubmit(files)
+
+    const onFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault()
 
-      if (prompt && onSubmit) {
-        onSubmit(prompt)
+      if (onSubmit) {
+        onSubmit()
       }
     }
 
@@ -53,14 +46,14 @@ export const MessageBar: React.FC<MessageBarProps> = memo(
             size="lg"
             minRows={1}
             maxRows={8}
-            value={prompt}
+            value={textValue}
             variant="bordered"
             placeholder="Type a message..."
             classNames={{
               inputWrapper: 'border-gray-100 hover:border-gray-100',
             }}
-            onValueChange={(value) => onPromptChange?.(value)}
-            isDisabled={disabled || loading}
+            onValueChange={(value) => setTextValue(value)}
+            isDisabled={conversations?.isGenerating}
             {...textareaProps}
             className={clsx(textareaProps.className)}
           />
@@ -72,11 +65,10 @@ export const MessageBar: React.FC<MessageBarProps> = memo(
             size="lg"
             type="submit"
             isDisabled={
-              disabled ||
-              loading ||
-              prompt?.replaceAll('\n', '').trim().length === 0
+              conversations?.isGenerating ||
+              textValue?.replaceAll('\n', '').trim().length === 0
             }
-            isLoading={loading}
+            isLoading={conversations?.isGenerating}
           >
             <SendIcon className="fill-white" />
           </Button>

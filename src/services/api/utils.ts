@@ -2,6 +2,7 @@ import { FileData } from '@/types/data.types'
 import { settle } from '@/utils/async.utils'
 import { groupBy } from '@/utils/groupBy.util'
 import type { GetQueryBuilder } from '@unbody-io/ts-client/build/core/query-builder/GetQueryBuilder'
+import axios, { AxiosError } from 'axios'
 import { ApiChatMessage } from '.'
 import {
   PROMPT_CHAT,
@@ -247,6 +248,41 @@ const parseUserPrompt = async (params: {
   }>(prompt, { json: true })
 }
 
+export const extractErrorMessage = (error: unknown): string => {
+  if (axios.isAxiosError(error)) {
+    const axiosError = error as AxiosError
+
+    if (axiosError.response) {
+      const statusCode = axiosError.response.status
+      const data = axiosError.response.data as any
+
+      // Specific handling for 401 error
+      if (statusCode === 401) {
+        return 'Authentication failed. Please check your credentials ProjectId and API key and try again.'
+      }
+
+      if (typeof data === 'string') {
+        return `Api error (${statusCode}): ${data}`
+      }
+
+      if (data && typeof data === 'object') {
+        const message = data.message || data.error || JSON.stringify(data)
+        return `Api error (${statusCode}): ${message}`
+      }
+
+      return `Api error (${statusCode})`
+    } else if (axiosError.request) {
+      return 'No response received from the server. Please check your internet connection.'
+    } else {
+      return axiosError.message || 'An unexpected api error occurred'
+    }
+  } else if (error instanceof Error) {
+    return error.message
+  } else {
+    return 'An unknown api error occurred'
+  }
+}
+
 export const apiUtils = {
   generate,
   extractJson,
@@ -254,4 +290,5 @@ export const apiUtils = {
   parseUserPrompt,
   generateFromFiles,
   generateFromManyQuery,
+  extractErrorMessage,
 }

@@ -63,6 +63,8 @@ export const ContextPanel: React.FC<ContextPanelProps> = ({
 
   const handleChipClick = useCallback(
     (key: FileType) => {
+      if (compact) return
+
       onFilteredFileTypesChange((prevFilteredFileTypes) => {
         const updatedFilteredFileTypes = new Set(prevFilteredFileTypes)
         if (updatedFilteredFileTypes.has(key)) {

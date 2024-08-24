@@ -1,5 +1,6 @@
 import { AnimatedText } from '@/components/AnimatedText'
 import { SearchBar } from '@/components/SearchBar'
+import { useConversations } from '@/contexts/ConversationContext'
 import clsx from 'clsx'
 import React from 'react'
 import { SearchResult, SearchResultProps } from '../SearchResult'
@@ -14,8 +15,6 @@ export type SearchProps = {
 
   selectedFiles?: SearchResultProps['selected']
   onSelect?: SearchResultProps['onSelect']
-
-  compact?: boolean
 }
 
 export const Search: React.FC<SearchProps> = ({
@@ -26,8 +25,11 @@ export const Search: React.FC<SearchProps> = ({
   onSearch,
   selectedFiles,
   onSelect,
-  compact,
 }) => {
+  const conversations = useConversations()
+
+  const compact = (conversations?.currentPath || []).length > 0
+
   return (
     <div className="flex flex-col">
       <SearchBar
