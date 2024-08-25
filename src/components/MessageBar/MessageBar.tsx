@@ -47,7 +47,6 @@ export const MessageBar: React.FC<MessageBarProps> = memo(
             minRows={1}
             maxRows={8}
             value={textValue}
-            variant="bordered"
             placeholder="Type a message..."
             classNames={{
               inputWrapper: 'border-gray-100 hover:border-gray-100',

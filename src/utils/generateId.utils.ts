@@ -1,3 +1,6 @@
 export const generateId = () => {
-  return `${Math.random().toString(8).substring(2, 9)}-${Date.now()}`
+  const randomPart = Math.random().toString(36).substring(2, 8)
+  const timestampPart = Date.now().toString(36).substring(0, 5)
+
+  return `${randomPart}-${timestampPart}`
 }

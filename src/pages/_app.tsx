@@ -1,4 +1,4 @@
-import ErrorBoundary from '@/components/ErrorBoundary'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 import '@/styles/globals.css'
 import { NextUIProvider } from '@nextui-org/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'

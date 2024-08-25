@@ -84,13 +84,12 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
             name: 'text-[16px]',
           }}
         />
-        <div className="flex-grow relative border border-gray-200 rounded-lg p-4 text-md bg-white shadow-sm mt-[-4px]">
+        <div className="flex-grow relative border border-gray-200 rounded-lg p-4  bg-white shadow-sm mt-[-4px]">
           {isEditing && role !== 'assistant' ? (
             <div>
               <Textarea
-                label="Description"
-                placeholder="Enter your description"
-                className=""
+                size="lg"
+                maxRows={8}
                 value={textValue}
                 onChange={(e) => setTextValue(e.target.value)}
               />
@@ -105,9 +104,13 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                 </Button>
                 <Button
                   type="submit"
+                  color="primary"
                   onClick={onFormSubmit}
+                  isDisabled={
+                    textValue?.replaceAll('\n', '').trim().length === 0 ||
+                    conversations?.isGenerating
+                  }
                   size="sm"
-                  className=""
                 >
                   Send
                 </Button>
@@ -137,8 +140,9 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                       variant="light"
                       radius="md"
                       className="px-1 min-w-1"
-                      disabled={
-                        conversations.messagesById[id].versionParentId == null
+                      isDisabled={
+                        conversations.messagesById[id].versionParentId ==
+                          null || conversations.isGenerating
                       }
                       onClick={() => {
                         if (
@@ -162,7 +166,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                       <BackArrowIcon />
                     </Button>
                     <span className="text-md">
-                      {currentVersionIndex} / {versionLength}{' '}
+                      {currentVersionIndex} / {versionLength}
                     </span>
 
                     <Button
@@ -170,7 +174,10 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                       variant="light"
                       radius="md"
                       className="px-1 min-w-1"
-                      disabled={versionLength === currentVersionIndex}
+                      isDisabled={
+                        versionLength === currentVersionIndex ||
+                        conversations.isGenerating
+                      }
                       onClick={() => {
                         if (dispatch)
                           dispatch({
