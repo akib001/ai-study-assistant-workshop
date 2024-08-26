@@ -39,7 +39,6 @@ This is a Next.js project. To set it up locally, follow these steps:
   - Modified existing logic
   - Integrated a new component
 - **SearchFilter.tsx**:
-  - Created a new icon map for future use
   - Implemented logic for filter type selection and file preservation
 - **MessageBar.tsx**:
   - Disabled Submit prompt button during search
@@ -137,7 +136,6 @@ This is a Next.js project. To set it up locally, follow these steps:
 
 1. Further context API integration for better state management
 2. Enhance error handling and input field validations
-3. Implement search filter icons
-4. Simplify version-switching and editing logic
-5. Add text skeleton for assistant responses while edited a message and submit a new prompt
-6. Provide user feedback for editing actions
+3. Simplify version-switching and editing logic
+4. Add text skeleton for assistant responses while edited a message and submit a new prompt
+5. Provide user feedback for editing actions
