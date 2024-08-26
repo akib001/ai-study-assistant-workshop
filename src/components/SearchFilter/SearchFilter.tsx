@@ -79,13 +79,13 @@ export const SearchFilter: React.FC<SearchFilterProps> = ({
         return (
           <Chip
             key={key}
-            size="lg"
-            startContent={<IconComponent className={'mr-1'} />}
+            // size="lg"
+            startContent={<IconComponent className={'mr-[6px]'} />}
             onClick={() => handleChipClick(key)}
             variant="shadow"
             isDisabled={disableFilter}
             className={clsx(
-              'py-5 px-4 bg-white text-foreground-500 cursor-pointer',
+              'py-5 px-4 bg-white text-medium text-foreground-500 cursor-pointer',
               filteredFileTypes.has(key) && 'bg-primary text-white',
             )}
           >
