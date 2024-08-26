@@ -37,6 +37,7 @@ export type SearchResultProps = Omit<
 
   hideList?: boolean
   compactOverview?: boolean
+  isSearching?: boolean
 }
 
 export const SearchResult: React.FC<SearchResultProps> = ({
@@ -48,6 +49,7 @@ export const SearchResult: React.FC<SearchResultProps> = ({
   className,
   hideList = false,
   compactOverview = false,
+  isSearching = false,
   ...props
 }) => {
   const [filteredFileTypes, setFilteredFileTypes] = React.useState<
@@ -121,14 +123,16 @@ export const SearchResult: React.FC<SearchResultProps> = ({
 
   return (
     <>
-      <SearchFilter
-        filteredFileTypes={filteredFileTypes}
-        onFilteredFileTypesChange={setFilteredFileTypes}
-        selected={selected}
-        onSelect={onSelect}
-        map={map}
-        disableFilter={compactOverview && files?.length > 0}
-      />
+      {!compactOverview && (
+        <SearchFilter
+          filteredFileTypes={filteredFileTypes}
+          onFilteredFileTypesChange={setFilteredFileTypes}
+          selected={selected}
+          onSelect={onSelect}
+          map={map}
+          disableFilter={files?.length <= 0 || isSearching}
+        />
+      )}
 
       <div className={clsx('relative', className)} {...props}>
         <div>

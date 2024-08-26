@@ -73,13 +73,12 @@ export const SearchFilter: React.FC<SearchFilterProps> = ({
   )
 
   return (
-    <div className="flex justify-center gap-4 mb-8">
+    <div className="flex justify-center gap-4 mb-10">
       {(Object.keys(iconMap) as Array<keyof typeof iconMap>).map((key) => {
         const IconComponent = iconMap[key].icon
         return (
           <Chip
             key={key}
-            // size="lg"
             startContent={<IconComponent className={'mr-[6px]'} />}
             onClick={() => handleChipClick(key)}
             variant="shadow"

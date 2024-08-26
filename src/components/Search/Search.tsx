@@ -67,6 +67,7 @@ export const Search: React.FC<SearchProps> = ({
               />
             }
             selected={selectedFiles}
+            isSearching={searching}
             onSelect={onSelect}
             files={results}
             hideList={compact}
