@@ -73,7 +73,7 @@ export const SearchFilter: React.FC<SearchFilterProps> = ({
   )
 
   return (
-    <div className="flex justify-center gap-4 mb-10">
+    <div className="flex flex-wrap justify-center gap-4 mb-10">
       {(Object.keys(iconMap) as Array<keyof typeof iconMap>).map((key) => {
         const IconComponent = iconMap[key].icon
         return (
