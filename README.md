@@ -45,7 +45,7 @@ This is a Next.js project. To set it up locally, follow these steps:
   - Disabled Submit prompt button during search
 - Refactored existing code for improved performance
 
-**Time taken**: [Insert time here]
+**Time taken**: [4 Hours]
 
 ## Task 2: Enhance Chat Functionality
 
@@ -117,7 +117,7 @@ This is a Next.js project. To set it up locally, follow these steps:
 - **Homepage.tsx**:
   - Moved states to context
 
-**Time taken**: [Insert time here]
+**Time taken**: [15 Hours]
 
 ## Bonus Task: Error Handling (Partially Completed)
 
@@ -131,7 +131,7 @@ This is a Next.js project. To set it up locally, follow these steps:
   - Enhanced queryFn with try-catch
   - Implemented error message extraction method
 
-**Time taken**: [Insert time here]
+**Time taken**: [1 Hour]
 
 ## Future Improvements:
 
