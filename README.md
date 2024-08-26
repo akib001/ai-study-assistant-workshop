@@ -135,7 +135,8 @@ This is a Next.js project. To set it up locally, follow these steps:
 ## Future Improvements:
 
 1. Further context API integration for better state management and refactor props drilling
-2. Enhance error handling and input field validations
-3. Simplify some filtering logics
-4. Add text skeleton for assistant responses while edited a message and submit a new prompt
-5. Provide user feedback for editing actions
+2. Mobile responsive design
+3. Enhance error handling and input field validations
+4. Simplify some filtering logics
+5. Add text skeleton for assistant responses while edited a message and submit a new prompt
+6. Provide user feedback for editing actions
