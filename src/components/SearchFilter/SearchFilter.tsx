@@ -2,13 +2,9 @@ import { FileData, FileType } from '@/types/data.types'
 import { Chip } from '@nextui-org/react'
 import clsx from 'clsx'
 import React, { useCallback } from 'react'
-import {
-  AudioFileIcon,
-  DraftIcon,
-  ImageIcon,
-  PdfFileIcon,
-  VideoFileIcon,
-} from '../icons'
+import { AudioFilterIcon, DocsFilterIcon, VideoFilterIcon } from '../icons'
+import { ImageFilterIcon } from '../icons/ImageFilterIcon'
+import { PdfFilterIcon } from '../icons/PdfFilterIcon'
 
 export type SearchFilterProps = {
   filteredFileTypes: Set<FileType>
@@ -16,6 +12,7 @@ export type SearchFilterProps = {
   selected?: string[]
   onSelect?: (selected: string[]) => void
   map: Record<string, FileData>
+  disableFilter?: boolean
 }
 
 const iconMap: Record<
@@ -23,23 +20,23 @@ const iconMap: Record<
   { icon: React.FC<any>; label: string }
 > = {
   document: {
-    icon: DraftIcon,
+    icon: DocsFilterIcon,
     label: 'Docs',
   },
   pdf: {
-    icon: PdfFileIcon,
+    icon: PdfFilterIcon,
     label: 'PDF',
   },
   image: {
-    icon: ImageIcon,
+    icon: ImageFilterIcon,
     label: 'Images',
   },
   audio: {
-    icon: AudioFileIcon,
+    icon: AudioFilterIcon,
     label: 'MP3/Audio',
   },
   video: {
-    icon: VideoFileIcon,
+    icon: VideoFilterIcon,
     label: 'MP4/Video',
   },
 }
@@ -50,6 +47,7 @@ export const SearchFilter: React.FC<SearchFilterProps> = ({
   selected = [] as string[],
   onSelect,
   map,
+  disableFilter = false,
 }) => {
   const handleChipClick = useCallback(
     (key: FileType) => {
@@ -75,24 +73,19 @@ export const SearchFilter: React.FC<SearchFilterProps> = ({
   )
 
   return (
-    <div className="flex justify-center gap-4">
+    <div className="flex justify-center gap-4 mb-8">
       {(Object.keys(iconMap) as Array<keyof typeof iconMap>).map((key) => {
         const IconComponent = iconMap[key].icon
         return (
           <Chip
             key={key}
-            startContent={
-              <IconComponent
-                className={clsx(
-                  'fill-primary',
-                  filteredFileTypes.has(key) && 'fill-white',
-                )}
-              />
-            }
+            size="lg"
+            startContent={<IconComponent className={'mr-1'} />}
             onClick={() => handleChipClick(key)}
             variant="shadow"
+            isDisabled={disableFilter}
             className={clsx(
-              'py-[20px] px-[16px] bg-white text-gray-800 cursor-pointer',
+              'py-5 px-4 bg-white text-foreground-500 cursor-pointer',
               filteredFileTypes.has(key) && 'bg-primary text-white',
             )}
           >

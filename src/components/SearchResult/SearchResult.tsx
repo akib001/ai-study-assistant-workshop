@@ -120,16 +120,15 @@ export const SearchResult: React.FC<SearchResultProps> = ({
   }
 
   return (
-    <div className="space-y-6">
-      {!compactOverview && files?.length > 0 && (
-        <SearchFilter
-          filteredFileTypes={filteredFileTypes}
-          onFilteredFileTypesChange={setFilteredFileTypes}
-          selected={selected}
-          onSelect={onSelect}
-          map={map}
-        />
-      )}
+    <>
+      <SearchFilter
+        filteredFileTypes={filteredFileTypes}
+        onFilteredFileTypesChange={setFilteredFileTypes}
+        selected={selected}
+        onSelect={onSelect}
+        map={map}
+        disableFilter={compactOverview && files?.length > 0}
+      />
 
       <div className={clsx('relative', className)} {...props}>
         <div>
@@ -231,6 +230,6 @@ export const SearchResult: React.FC<SearchResultProps> = ({
           </Accordion>
         </div>
       </div>
-    </div>
+    </>
   )
 }

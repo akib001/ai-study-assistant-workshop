@@ -35,7 +35,7 @@ export const Search: React.FC<SearchProps> = ({
       <SearchBar
         className={clsx(
           'transition',
-          'mb-10',
+          'mb-5',
           compact && ['opacity-0', 'invisible', 'h-0', 'mb-0'],
         )}
         value={query}
