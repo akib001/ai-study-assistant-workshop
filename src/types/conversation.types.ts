@@ -5,18 +5,18 @@ export enum RoleType {
 
 export type MessageType = {
   id: string
-  content: string
+  content: string // The message content
   role: RoleType
-  childrenId: string
+  childrenId: string // Reference to the next message in the conversation
   versionParentId: string | null // Reference to the original message this is a version of
-  versionIds: string[]
-  activeVersionPosition: number // 1 based index. if 0 then it's the message itself
+  versionIds: string[] // List of version ids. If there is no version then it's an empty array
+  activeVersionPosition: number // The index of the active version in the versionIds array. If it's the original message then it's 0. If it's the first version then it's 1, and so on. And it is used for preserving the active version when switching between messages. I noticed chatgpt doesn't preserve the active version when switching between messages, so I added this feature
 }
 export type ConversationState = {
-  messagesById: { [id: string]: MessageType }
-  currentPath: string[]
-  disableAnimation: boolean
-  isGenerating: boolean
+  messagesById: { [id: string]: MessageType } // Map of message id to message
+  currentPath: string[] // List of message ids that are currently being viewed. If the edit version is switched, the path will be updated
+  disableAnimation: boolean // Whether to disable animations. This used to prevent animations like when assistant is generating a edited version response, or assistant is generating a response
+  isGenerating: boolean // Whether the assistant is currently generating a response. Moved isGenerating state from HomePage to context to make it easier to manage
 }
 
 export enum ConversationActionType {
