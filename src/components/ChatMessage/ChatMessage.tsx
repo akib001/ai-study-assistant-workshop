@@ -115,6 +115,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                   size="sm"
                   onClick={toggleEditMode}
                   className="ml-auto"
+                  aria-label="Cancel"
                 >
                   Cancel
                 </Button>
@@ -127,6 +128,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                     conversations?.isGenerating
                   }
                   size="sm"
+                  aria-label="Save"
                 >
                   Send
                 </Button>
@@ -158,6 +160,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                     onClick={() =>
                       handleSwitchVersion(currentVersionPosition - 2)
                     }
+                    aria-label="Previous"
                   >
                     <BackArrowIcon />
                   </Button>
@@ -175,6 +178,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                       conversations?.isGenerating
                     }
                     onClick={() => handleSwitchVersion(currentVersionPosition)}
+                    aria-label="Next"
                   >
                     <NextArrowIcon />
                   </Button>
