@@ -1,7 +1,7 @@
 import { FileData, FileType } from '@/types/data.types'
 import { Chip } from '@nextui-org/react'
 import clsx from 'clsx'
-import React, { useCallback, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import {
   AudioFileIcon,
   DraftIcon,
@@ -28,7 +28,6 @@ export type ContextPanelProps = Omit<
   compact?: boolean
   map: Record<string, FileData>
   filteredFileTypes: Set<FileType>
-  onFilteredFileTypesChange: React.Dispatch<React.SetStateAction<Set<FileType>>>
 }
 
 export const ContextPanel: React.FC<ContextPanelProps> = ({
@@ -37,7 +36,6 @@ export const ContextPanel: React.FC<ContextPanelProps> = ({
   compact = false,
   className,
   filteredFileTypes,
-  onFilteredFileTypesChange,
   ...props
 }) => {
   const numberOfFiles = Object.values(map).filter(
@@ -47,7 +45,11 @@ export const ContextPanel: React.FC<ContextPanelProps> = ({
   const grouped = useMemo(() => {
     const groups = Object.fromEntries(
       Object.keys(iconMap)
-        .filter((key) => key !== 'folder')
+        .filter((key) =>
+          key !== 'folder' && filteredFileTypes.size === 0
+            ? true
+            : filteredFileTypes.has(key as FileType),
+        )
         .map((key) => [key, [] as FileData[]]),
     ) as Record<FileData['type'], FileData[]>
 
@@ -60,23 +62,6 @@ export const ContextPanel: React.FC<ContextPanelProps> = ({
 
     return Object.entries(groups) as [FileData['type'], FileData[]][]
   }, [selected, map])
-
-  const handleChipClick = useCallback(
-    (key: FileType) => {
-      if (compact) return
-
-      onFilteredFileTypesChange((prevFilteredFileTypes) => {
-        const updatedFilteredFileTypes = new Set(prevFilteredFileTypes)
-        if (updatedFilteredFileTypes.has(key)) {
-          updatedFilteredFileTypes.delete(key)
-        } else {
-          updatedFilteredFileTypes.add(key)
-        }
-        return updatedFilteredFileTypes
-      })
-    },
-    [onFilteredFileTypesChange],
-  )
 
   return (
     <div
@@ -97,13 +82,11 @@ export const ContextPanel: React.FC<ContextPanelProps> = ({
           return (
             <Chip
               key={key + items.length}
-              onClick={() => handleChipClick(key)}
               variant="flat"
               color="primary"
               className={clsx(
-                'py-[20px] px-[16px] bg-[#ECECEC] cursor-pointer',
+                'py-[20px] px-[16px] bg-[#ECECEC]',
                 'duration-100',
-                filteredFileTypes.has(key) && 'bg-blue-200',
                 compact &&
                   items.length === 0 && [
                     'opacity-0',

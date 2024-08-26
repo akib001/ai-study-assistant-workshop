@@ -5,6 +5,7 @@ import React, { useMemo } from 'react'
 import { ContextPanel } from '../ContextPanel/ContextPanel'
 import { FileCard } from '../FileCard'
 import { FolderCard } from '../FolderCard'
+import { SearchFilter } from '../SearchFilter'
 import {
   AudioFileIcon,
   DraftIcon,
@@ -52,18 +53,31 @@ export const SearchResult: React.FC<SearchResultProps> = ({
   const [filteredFileTypes, setFilteredFileTypes] = React.useState<
     Set<FileType>
   >(() => new Set())
+
   const map: Record<string, FileData> = useMemo(
-    () => Object.fromEntries(files.map((file) => [file.id, file])),
-    [files, selected],
+    () =>
+      Object.fromEntries(
+        files
+          .filter(
+            (file) =>
+              filteredFileTypes.size === 0 || filteredFileTypes.has(file.type), // like this everywhere
+          )
+          .map((file) => [file.id, file]),
+      ),
+    [files, selected, filteredFileTypes],
   )
 
   const [directoriesGroup, filesGroup] = useMemo(
     () => [
-      files.filter((f) => f.type === 'folder'),
-      files.filter((f) =>
-        f.type !== 'folder' && filteredFileTypes.size === 0
-          ? true
-          : filteredFileTypes.has(f.type),
+      files.filter(
+        (f) =>
+          f.type === 'folder' &&
+          (filteredFileTypes.size === 0 || filteredFileTypes.has(f.type)),
+      ),
+      files.filter(
+        (f) =>
+          f.type !== 'folder' &&
+          (filteredFileTypes.size === 0 || filteredFileTypes.has(f.type)),
       ),
     ],
     [files, map, filteredFileTypes],
@@ -106,79 +120,58 @@ export const SearchResult: React.FC<SearchResultProps> = ({
   }
 
   return (
-    <div className={clsx('relative', className)} {...props}>
-      <div>
-        {title && <h2 className="text-lg font-semibold">{title}</h2>}
-        {description && <p className="text-sm text-gray-500">{description}</p>}
-        <div className="py-2 pb-8">
-          <ContextPanel
-            map={map}
-            selected={selected}
-            compact={compactOverview}
-            className={clsx(
-              'duration-300',
-              'absolute right-0 w-full transition',
-              !compactOverview && 'translate-y-0',
-              compactOverview && 'translate-y-[-50px]',
-            )}
-            filteredFileTypes={filteredFileTypes}
-            onFilteredFileTypesChange={setFilteredFileTypes}
-          />
+    <div className="space-y-6">
+      <SearchFilter
+        filteredFileTypes={filteredFileTypes}
+        onFilteredFileTypesChange={setFilteredFileTypes}
+        selected={selected}
+        onSelect={onSelect}
+        map={map}
+      />
+      <div className={clsx('relative', className)} {...props}>
+        <div>
+          {title && <h2 className="text-lg font-semibold">{title}</h2>}
+          {description && (
+            <p className="text-sm text-gray-500">{description}</p>
+          )}
+          <div className="py-2 pb-8">
+            <ContextPanel
+              map={map}
+              selected={selected}
+              compact={compactOverview}
+              className={clsx(
+                'duration-300',
+                'absolute right-0 w-full transition',
+                !compactOverview && 'translate-y-0',
+                compactOverview && 'translate-y-[-50px]',
+              )}
+              filteredFileTypes={filteredFileTypes}
+            />
+          </div>
         </div>
-      </div>
-      <div className="mt-8">
-        <Accordion
-          isCompact
-          hideIndicator
-          keepContentMounted
-          selectedKeys={!hideList ? ['root-tree'] : []}
-        >
-          <AccordionItem
-            title={null}
-            key="root-tree"
-            HeadingComponent={() => <></>}
+        <div className="mt-8">
+          <Accordion
+            isCompact
+            hideIndicator
+            keepContentMounted
+            selectedKeys={!hideList ? ['root-tree'] : []}
           >
-            <div className={clsx('max-h-[500px] overflow-y-auto')}>
-              {directoriesGroup.map((item, index) => (
-                <div key={index}>
-                  <div className={clsx('flex flex-row items-center')}>
-                    <FolderCard
-                      name={item.name}
-                      label={[
-                        'Folder',
-                        `${(item.children || []).length} items`,
-                      ]}
-                      selectedKeys={[]}
-                      itemProps={{
-                        onPress: () => onCheckboxChange(item.id),
-                        startContent: (
-                          <>
-                            <Checkbox
-                              className="pe-[16px]"
-                              isSelected={isItemSelected(item.id)}
-                              onValueChange={() => onCheckboxChange(item.id)}
-                            />
-                          </>
-                        ),
-                        hideIndicator: true,
-                      }}
-                    />
-                  </div>
-                </div>
-              ))}
-
-              <Divider className="my-2" />
-
-              {filesGroup.map((item, index) => {
-                const IconComponent = iconMap[item.type]
-
-                return (
+            <AccordionItem
+              title={null}
+              key="root-tree"
+              HeadingComponent={() => <></>}
+            >
+              <div className={clsx('max-h-[500px] overflow-y-auto')}>
+                {directoriesGroup.map((item, index) => (
                   <div key={index}>
                     <div className={clsx('flex flex-row items-center')}>
-                      <FileCard
+                      <FolderCard
                         name={item.name}
-                        tags={item.tags}
-                        excerpt={item.excerpt}
+                        label={[
+                          'Folder',
+                          `${(item.children || []).length} items`,
+                        ]}
+                        selectedKeys={[]}
                         itemProps={{
                           onPress: () => onCheckboxChange(item.id),
                           startContent: (
@@ -190,17 +183,50 @@ export const SearchResult: React.FC<SearchResultProps> = ({
                               />
                             </>
                           ),
+                          hideIndicator: true,
                         }}
-                        icon={<IconComponent />}
-                        extension={item.extension || ''}
                       />
                     </div>
                   </div>
-                )
-              })}
-            </div>
-          </AccordionItem>
-        </Accordion>
+                ))}
+
+                <Divider className="my-2" />
+
+                {filesGroup.map((item, index) => {
+                  const IconComponent = iconMap[item.type]
+
+                  return (
+                    <div key={index}>
+                      <div className={clsx('flex flex-row items-center')}>
+                        <FileCard
+                          name={item.name}
+                          tags={item.tags}
+                          excerpt={item.excerpt}
+                          itemProps={{
+                            onPress: () => onCheckboxChange(item.id),
+                            startContent: (
+                              <>
+                                <Checkbox
+                                  className="pe-[16px]"
+                                  isSelected={isItemSelected(item.id)}
+                                  onValueChange={() =>
+                                    onCheckboxChange(item.id)
+                                  }
+                                />
+                              </>
+                            ),
+                          }}
+                          icon={<IconComponent />}
+                          extension={item.extension || ''}
+                        />
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </AccordionItem>
+          </Accordion>
+        </div>
       </div>
     </div>
   )

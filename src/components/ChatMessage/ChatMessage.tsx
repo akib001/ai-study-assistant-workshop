@@ -15,7 +15,8 @@ import { useAnimatedText } from '../AnimatedText'
 import { BackArrowIcon } from '../icons/BackArrowIcon'
 import { NextArrowIcon } from '../icons/NextArrowIcon'
 
-export type ChatMessageProps = Omit<React.HTMLProps<HTMLDivElement>, 'role'> & {
+//TODO: remove this if not necessary
+type ChatMessageProps = Omit<React.HTMLProps<HTMLDivElement>, 'role'> & {
   id: string
   message: string
   role: 'user' | 'assistant'
