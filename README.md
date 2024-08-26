@@ -79,7 +79,7 @@ This is a Next.js project. To set it up locally, follow these steps:
 - **ConversationContext**:
 
   - Structured context state for efficiency
-  - Implemented flat data structure to avoid bloat
+  - Implemented flat data structure to avoid data bloat
   - ```javascript
     export enum RoleType {
       USER = 'user',
