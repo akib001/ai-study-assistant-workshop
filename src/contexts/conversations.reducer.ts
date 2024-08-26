@@ -44,68 +44,63 @@ export const conversationsReducer = (
 
       return updatedState
     }
-
     case ConversationActionType.EDIT_MESSAGE: {
-      // TODO: need to refactor newContent to message
       const { messageId, message: newContent } = action.payload
 
-      const nextVersionIndex =
-        state.messagesById[messageId].activeVersionPosition === 0 &&
-        state.messagesById[messageId].versionParentId == null
-          ? state.messagesById[messageId].versionIds.length + 1
-          : state.messagesById[messageId].versionParentId != null
-            ? state?.messagesById[
-                state.messagesById[messageId].versionParentId!
-              ]?.versionIds.length + 1
-            : 0
+      const currentMessage = state.messagesById[messageId]
+      const isOriginalMessage =
+        currentMessage.activeVersionPosition === 0 &&
+        !currentMessage.versionParentId
 
-      const parentMessage =
-        nextVersionIndex === 1
-          ? state.messagesById[messageId]
-          : state.messagesById[
-              state.messagesById[messageId].versionParentId || messageId
-            ]
-      // refactor letter
+      const nextVersionIndex = isOriginalMessage
+        ? currentMessage.versionIds.length + 1
+        : state.messagesById[currentMessage.versionParentId!]?.versionIds
+            .length + 1 || 0
+
+      const parentMessageId = isOriginalMessage
+        ? messageId
+        : currentMessage.versionParentId || messageId
+      const parentMessage = state.messagesById[parentMessageId]
+
       if (!parentMessage) return state
 
-      const newId = generateId()
-      const newMessage: MessageType = {
+      const newMessageId = generateId()
+      const newMessage = {
         role: parentMessage.role,
-        id: newId,
+        id: newMessageId,
         content: newContent,
         childrenId: '',
-        versionParentId: parentMessage.id, // could be null
+        versionParentId: parentMessage.id,
         versionIds: [],
         activeVersionPosition: 0,
       }
 
-      let updatedState = {
-        ...state,
-        messagesById: {
-          ...state.messagesById,
-          [newId]: newMessage,
-          [parentMessage.id]: {
-            ...parentMessage,
-            versionIds: [...parentMessage.versionIds, newId],
-            activeVersionPosition: parentMessage.versionIds.length + 1,
-          },
+      const updatedMessagesById = {
+        ...state.messagesById,
+        [newMessageId]: newMessage,
+        [parentMessage.id]: {
+          ...parentMessage,
+          versionIds: [...parentMessage.versionIds, newMessageId],
+          activeVersionPosition: nextVersionIndex,
         },
-        disableAnimation: false,
       }
 
       const messageIndex = state.currentPath.indexOf(messageId)
-      if (messageIndex !== -1) {
-        updatedState.currentPath = [
-          ...state.currentPath.slice(0, messageIndex),
-          newId,
-        ]
-      }
+      const updatedCurrentPath =
+        messageIndex !== -1
+          ? [...state.currentPath.slice(0, messageIndex), newMessageId]
+          : state.currentPath
 
-      return updatedState
+      return {
+        ...state,
+        messagesById: updatedMessagesById,
+        currentPath: updatedCurrentPath,
+        disableAnimation: false,
+      }
     }
 
     case ConversationActionType.SWITCH_VERSION: {
-      const { messageId, targetVersion } = action.payload // TODO: targetVersionIndex must be 0 indexed
+      const { messageId, targetVersionIndex } = action.payload
 
       const message = state.messagesById[messageId]
       if (!message) return state
@@ -116,13 +111,13 @@ export const conversationsReducer = (
       if (!versionParent) return state
 
       const targetMessageId =
-        targetVersion === 0
+        targetVersionIndex === 0
           ? versionParentId
-          : versionParent.versionIds[targetVersion - 1] // TODO: targetVersion needs to be 1 indexed
+          : versionParent.versionIds[targetVersionIndex - 1]
 
       if (!targetMessageId) return state
 
-      const messageIndex = state.currentPath.indexOf(messageId) // cloud be not found
+      const messageIndex = state.currentPath.indexOf(messageId)
       if (messageIndex === -1) return state
 
       // Preserve the downstream messages
@@ -140,7 +135,7 @@ export const conversationsReducer = (
           ...state.messagesById,
           [versionParentId]: {
             ...versionParent,
-            activeVersionPosition: targetVersion,
+            activeVersionPosition: targetVersionIndex,
           },
         },
         currentPath: newPath,

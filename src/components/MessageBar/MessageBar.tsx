@@ -13,10 +13,11 @@ export type MessageBarProps = Omit<
   hide?: boolean
   files: FileData[]
   textareaProps?: TextAreaProps
+  searching?: boolean
 }
 
 export const MessageBar: React.FC<MessageBarProps> = memo(
-  ({ hide, files, textareaProps = {}, ...props }) => {
+  ({ hide, files, searching = false, textareaProps = {}, ...props }) => {
     const conversations = useConversations()
 
     const { textValue, setTextValue, onSubmit } = usePromptSubmit(files)
@@ -65,7 +66,8 @@ export const MessageBar: React.FC<MessageBarProps> = memo(
             type="submit"
             isDisabled={
               conversations?.isGenerating ||
-              textValue?.replaceAll('\n', '').trim().length === 0
+              textValue?.replaceAll('\n', '').trim().length === 0 ||
+              searching
             }
             isLoading={conversations?.isGenerating}
           >

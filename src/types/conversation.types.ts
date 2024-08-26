@@ -37,7 +37,7 @@ export type ConversationAction =
     }
   | {
       type: ConversationActionType.SWITCH_VERSION
-      payload: { messageId: string; targetVersion: number }
+      payload: { messageId: string; targetVersionIndex: number }
     }
   | {
       type: ConversationActionType.TOGGLE_GENERATING

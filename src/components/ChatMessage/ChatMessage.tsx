@@ -15,17 +15,8 @@ import { useAnimatedText } from '../AnimatedText'
 import { BackArrowIcon } from '../icons/BackArrowIcon'
 import { NextArrowIcon } from '../icons/NextArrowIcon'
 
-//TODO: remove this if not necessary
-type ChatMessageProps = Omit<React.HTMLProps<HTMLDivElement>, 'role'> & {
-  id: string
-  message: string
-  role: 'user' | 'assistant'
-  disableAnimation?: boolean
-  files: FileData[]
-}
-
 function getVersionInfo(conversations: ConversationState | null, id: string) {
-  if (!conversations) return { currentVersionIndex: 0, versionLength: 0 }
+  if (!conversations) return { currentVersionPosition: 0, versionLength: 0 }
 
   const message = conversations.messagesById[id]
   const isOriginalMessage =
@@ -34,7 +25,7 @@ function getVersionInfo(conversations: ConversationState | null, id: string) {
     ? conversations.messagesById[message.versionParentId]
     : message
 
-  const currentVersionIndex = isOriginalMessage
+  const currentVersionPosition = isOriginalMessage
     ? message.activeVersionPosition + 1
     : parentMessage.activeVersionPosition + 1
 
@@ -42,7 +33,15 @@ function getVersionInfo(conversations: ConversationState | null, id: string) {
     ? message.versionIds.length + 1
     : parentMessage.versionIds.length + 1
 
-  return { currentVersionIndex, versionLength }
+  return { currentVersionPosition, versionLength }
+}
+
+type ChatMessageProps = Omit<React.HTMLProps<HTMLDivElement>, 'role'> & {
+  id: string
+  message: string
+  role: 'user' | 'assistant'
+  disableAnimation?: boolean
+  files: FileData[]
 }
 
 export const ChatMessage: React.FC<ChatMessageProps> = ({
@@ -69,7 +68,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
     setIsEditing((value) => !value)
   }
 
-  const { currentVersionIndex, versionLength } = useMemo(
+  const { currentVersionPosition, versionLength } = useMemo(
     () => getVersionInfo(conversations, id),
     [conversations, id],
   )
@@ -80,11 +79,11 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
     }
   }
 
-  const handleSwitchVersion = (targetVersion: number) => {
+  const handleSwitchVersion = (targetVersionIndex: number) => {
     if (dispatch) {
       dispatch({
         type: ConversationActionType.SWITCH_VERSION,
-        payload: { messageId: id, targetVersion },
+        payload: { messageId: id, targetVersionIndex },
       })
     }
   }
@@ -145,7 +144,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
               <Button size="sm" onClick={toggleEditMode} className=" ">
                 Edit
               </Button>
-              {versionLength > 1 && (
+              {currentVersionPosition > 0 && versionLength > 1 && (
                 <>
                   <Button
                     size="sm"
@@ -153,14 +152,17 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                     radius="md"
                     className="px-1 min-w-1"
                     isDisabled={
-                      currentVersionIndex === 1 || conversations?.isGenerating
+                      currentVersionPosition === 1 ||
+                      conversations?.isGenerating
                     }
-                    onClick={() => handleSwitchVersion(currentVersionIndex - 2)}
+                    onClick={() =>
+                      handleSwitchVersion(currentVersionPosition - 2)
+                    }
                   >
                     <BackArrowIcon />
                   </Button>
                   <span className="text-md">
-                    {currentVersionIndex} / {versionLength}
+                    {currentVersionPosition} / {versionLength}
                   </span>
 
                   <Button
@@ -169,10 +171,10 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                     radius="md"
                     className="px-1 min-w-1"
                     isDisabled={
-                      versionLength === currentVersionIndex ||
+                      versionLength === currentVersionPosition ||
                       conversations?.isGenerating
                     }
-                    onClick={() => handleSwitchVersion(currentVersionIndex)}
+                    onClick={() => handleSwitchVersion(currentVersionPosition)}
                   >
                     <NextArrowIcon />
                   </Button>

@@ -11,7 +11,7 @@ export type HomePageProps = React.HTMLProps<HTMLDivElement>
 
 export const HomePage: React.FC<HomePageProps> = ({ className, ...props }) => {
   const [query, setQuery] = useState('')
-  const [selectedFiles, setSelectedFiles] = useState<string[]>([]) //TODO: sometimes it lost state
+  const [selectedFiles, setSelectedFiles] = useState<string[]>([])
 
   const search = useSearch(
     { query },
@@ -48,6 +48,7 @@ export const HomePage: React.FC<HomePageProps> = ({ className, ...props }) => {
           <MessageBar
             hide={selectedFiles.length === 0}
             files={fileList.filter((f) => selectedFiles.includes(f.id))}
+            searching={search.isFetching}
           />
         }
       >

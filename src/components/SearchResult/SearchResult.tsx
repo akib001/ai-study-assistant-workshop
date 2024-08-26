@@ -121,13 +121,16 @@ export const SearchResult: React.FC<SearchResultProps> = ({
 
   return (
     <div className="space-y-6">
-      <SearchFilter
-        filteredFileTypes={filteredFileTypes}
-        onFilteredFileTypesChange={setFilteredFileTypes}
-        selected={selected}
-        onSelect={onSelect}
-        map={map}
-      />
+      {!compactOverview && files?.length > 0 && (
+        <SearchFilter
+          filteredFileTypes={filteredFileTypes}
+          onFilteredFileTypesChange={setFilteredFileTypes}
+          selected={selected}
+          onSelect={onSelect}
+          map={map}
+        />
+      )}
+
       <div className={clsx('relative', className)} {...props}>
         <div>
           {title && <h2 className="text-lg font-semibold">{title}</h2>}
