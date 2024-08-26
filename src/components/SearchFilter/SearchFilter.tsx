@@ -64,7 +64,7 @@ export const SearchFilter: React.FC<SearchFilterProps> = ({
         onSelect(
           selected.filter(
             (id) =>
-              updatedFilteredFileTypes.size === 0 ||
+              !updatedFilteredFileTypes.size ||
               updatedFilteredFileTypes.has(map[id].type),
           ),
         )

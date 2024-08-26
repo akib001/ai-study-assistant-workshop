@@ -46,7 +46,7 @@ export const ContextPanel: React.FC<ContextPanelProps> = ({
     const groups = Object.fromEntries(
       Object.keys(iconMap)
         .filter((key) =>
-          key !== 'folder' && filteredFileTypes.size === 0
+          key !== 'folder' && !filteredFileTypes.size
             ? true
             : filteredFileTypes.has(key as FileType),
         )

@@ -62,7 +62,9 @@ export const SearchResult: React.FC<SearchResultProps> = ({
         files
           .filter(
             (file) =>
-              filteredFileTypes.size === 0 || filteredFileTypes.has(file.type), // like this everywhere
+              !filteredFileTypes.size ||
+              file.type === 'folder' ||
+              filteredFileTypes.has(file.type),
           )
           .map((file) => [file.id, file]),
       ),
@@ -71,15 +73,24 @@ export const SearchResult: React.FC<SearchResultProps> = ({
 
   const [directoriesGroup, filesGroup] = useMemo(
     () => [
-      files.filter(
-        (f) =>
-          f.type === 'folder' &&
-          (filteredFileTypes.size === 0 || filteredFileTypes.has(f.type)),
-      ),
+      files
+        .filter(
+          (f) =>
+            f.type === 'folder' &&
+            (!filteredFileTypes.size ||
+              f.children?.some((child) => filteredFileTypes.has(child.type))),
+        )
+        .map((folder) => ({
+          ...folder,
+          children: folder.children?.filter(
+            (child) =>
+              !filteredFileTypes.size || filteredFileTypes.has(child.type),
+          ),
+        })),
       files.filter(
         (f) =>
           f.type !== 'folder' &&
-          (filteredFileTypes.size === 0 || filteredFileTypes.has(f.type)),
+          (!filteredFileTypes.size || filteredFileTypes.has(f.type)),
       ),
     ],
     [files, map, filteredFileTypes],
@@ -108,7 +119,16 @@ export const SearchResult: React.FC<SearchResultProps> = ({
             (item) => !children.map((child) => child.id).includes(item),
           )
         : Array.from(
-            new Set([...selected, ...children.map((child) => child.id)]),
+            new Set([
+              ...selected,
+              ...children
+                .filter(
+                  (child) =>
+                    !filteredFileTypes.size ||
+                    filteredFileTypes.has(child.type),
+                )
+                .map((child) => child.id),
+            ]),
           )
 
       onSelectionChange(newSelected)
