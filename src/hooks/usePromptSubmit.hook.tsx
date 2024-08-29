@@ -42,7 +42,7 @@ export const usePromptSubmit = (
         prompt: textValue,
         files,
         history:
-          conversations?.currentPath.map((id) => ({
+          conversations.currentPath.map((id) => ({
             message: conversations.messagesById[id].content,
             role: conversations.messagesById[id].role,
           })) || [],

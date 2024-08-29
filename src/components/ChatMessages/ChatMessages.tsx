@@ -13,13 +13,13 @@ export const ChatMessages: React.FC<ChatMessagesProps> = ({
   files,
   ...props
 }) => {
-  const conversations = useConversations()
+  const { messagesById, currentPath, disableAnimation } = useConversations()
   const ref = useRef<HTMLDivElement>(null)
   const data =
-    conversations?.currentPath.map((id) => ({
+    currentPath.map((id) => ({
       id,
-      message: conversations.messagesById[id].content,
-      role: conversations.messagesById[id].role,
+      message: messagesById[id].content,
+      role: messagesById[id].role,
     })) || []
 
   const messagesRef = useRef(data)
@@ -31,7 +31,7 @@ export const ChatMessages: React.FC<ChatMessagesProps> = ({
     messagesRef.current = data
     const parent = ref.current.parentElement
 
-    if (!conversations?.disableAnimation) {
+    if (!disableAnimation) {
       setTimeout(() => {
         parent?.scrollBy({
           top: parent.scrollHeight,
@@ -39,7 +39,7 @@ export const ChatMessages: React.FC<ChatMessagesProps> = ({
         })
       }, 1000)
     }
-  }, [data, conversations?.disableAnimation])
+  }, [data, messagesById, disableAnimation])
 
   return (
     <div
@@ -56,9 +56,7 @@ export const ChatMessages: React.FC<ChatMessagesProps> = ({
           id={message.id}
           role={message.role}
           message={message.message}
-          disableAnimation={
-            conversations?.disableAnimation || index < data.length - 1
-          }
+          disableAnimation={disableAnimation || index < data.length - 1}
           files={files}
         />
       ))}

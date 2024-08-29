@@ -18,7 +18,7 @@ export const DocsFilterIcon: React.FC<DocsFilterIconProps> = ({ ...props }) => {
       <path
         d="M930.068 341.32H718.152c-64.748 0-123.208-59.49-123.208-125.492V0l335.124 341.32z"
         fill="#FFFFFF"
-        fill-opacity=".4"
+        fillOpacity=".4"
       />
       <path
         d="M427.377 725.32V768H259.814v-42.68h167.563zM594.944 640v42.68h-335.13V640h335.13z m0-85.32v42.64h-335.13v-42.64h335.13z m0-85.36V512h-335.13v-42.68h335.13z"

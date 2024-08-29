@@ -11,17 +11,17 @@ import {
 } from 'react'
 import { conversationsReducer } from './conversations.reducer'
 
-const ConversationContext = createContext<ConversationState | null>(null)
-
-const ConversationDispatchContext =
-  createContext<Dispatch<ConversationAction> | null>(null)
-
 const initialState: ConversationState = {
   messagesById: {},
   currentPath: [],
   isGenerating: false,
   disableAnimation: false,
 }
+
+const ConversationContext = createContext<ConversationState>(initialState)
+
+const ConversationDispatchContext =
+  createContext<Dispatch<ConversationAction> | null>(null)
 
 type ConversationProviderProps = {
   children: ReactNode

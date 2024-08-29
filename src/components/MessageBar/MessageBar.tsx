@@ -18,7 +18,7 @@ export type MessageBarProps = Omit<
 
 export const MessageBar: React.FC<MessageBarProps> = memo(
   ({ hide, files, searching = false, textareaProps = {}, ...props }) => {
-    const conversations = useConversations()
+    const { isGenerating } = useConversations()
 
     const { textValue, setTextValue, onSubmit } = usePromptSubmit(files)
 
@@ -53,7 +53,7 @@ export const MessageBar: React.FC<MessageBarProps> = memo(
               inputWrapper: 'border-gray-100 hover:border-gray-100',
             }}
             onValueChange={(value) => setTextValue(value)}
-            isDisabled={conversations?.isGenerating}
+            isDisabled={isGenerating}
             {...textareaProps}
             className={clsx(textareaProps.className)}
           />
@@ -65,11 +65,11 @@ export const MessageBar: React.FC<MessageBarProps> = memo(
             size="lg"
             type="submit"
             isDisabled={
-              conversations?.isGenerating ||
+              isGenerating ||
               textValue?.replaceAll('\n', '').trim().length === 0 ||
               searching
             }
-            isLoading={conversations?.isGenerating}
+            isLoading={isGenerating}
           >
             <SendIcon className="fill-white" />
           </Button>

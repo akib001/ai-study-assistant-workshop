@@ -26,9 +26,9 @@ export const Search: React.FC<SearchProps> = ({
   selectedFiles,
   onSelect,
 }) => {
-  const conversations = useConversations()
+  const { currentPath } = useConversations()
 
-  const compact = (conversations?.currentPath || []).length > 0
+  const compact = (currentPath || []).length > 0
 
   return (
     <div className="flex flex-col">

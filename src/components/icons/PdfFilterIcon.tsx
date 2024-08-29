@@ -22,7 +22,7 @@ export const PdfFilterIcon: React.FC<PdfFilterIconProps> = ({ ...props }) => {
       <path
         d="M930.068 341.32H718.152c-64.748 0-123.208-59.49-123.208-125.492V0l335.124 341.32z"
         fill="#FFFFFF"
-        fill-opacity=".4"
+        fillOpacity=".4"
       />
     </svg>
   )

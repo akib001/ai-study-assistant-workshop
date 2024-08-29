@@ -15,9 +15,7 @@ import { useAnimatedText } from '../AnimatedText'
 import { BackArrowIcon } from '../icons/BackArrowIcon'
 import { NextArrowIcon } from '../icons/NextArrowIcon'
 
-function getVersionInfo(conversations: ConversationState | null, id: string) {
-  if (!conversations) return { currentVersionPosition: 0, versionLength: 0 }
-
+function getVersionInfo(conversations: ConversationState, id: string) {
   const message = conversations.messagesById[id]
   const isOriginalMessage =
     message.activeVersionPosition === 0 && message.versionParentId == null
@@ -125,7 +123,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                   onClick={onFormSubmit}
                   isDisabled={
                     textValue?.replaceAll('\n', '').trim().length === 0 ||
-                    conversations?.isGenerating
+                    conversations.isGenerating
                   }
                   size="sm"
                   aria-label="Save"
@@ -154,8 +152,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                     radius="md"
                     className="px-1 min-w-1"
                     isDisabled={
-                      currentVersionPosition === 1 ||
-                      conversations?.isGenerating
+                      currentVersionPosition === 1 || conversations.isGenerating
                     }
                     onClick={() =>
                       handleSwitchVersion(currentVersionPosition - 2)
@@ -175,7 +172,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                     className="px-1 min-w-1"
                     isDisabled={
                       versionLength === currentVersionPosition ||
-                      conversations?.isGenerating
+                      conversations.isGenerating
                     }
                     onClick={() => handleSwitchVersion(currentVersionPosition)}
                     aria-label="Next"
